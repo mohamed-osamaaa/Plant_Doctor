@@ -11,9 +11,9 @@ This project is an AI-powered backend application built with **NestJS** that ana
 * Returns structured JSON response with the following fields:
 
   * `diseaseName` (in Arabic)
-  * `severity` (Low / Medium / High / None)
+  * `severity` (عالية / متوسطة / منخفضة / لا يوجد)
   * `treatmentAdvice` (in Arabic)
-  * `confidenceScore` (0.0 - 1.0)
+  * `confidenceScore` → (%0 - %100)
 * Validates file type and size (max 4MB).
 * Ready-to-use frontend HTML page for uploading and displaying results.
 
@@ -88,9 +88,9 @@ Uploads and analyzes a plant image.
 ```json
 {
   "diseaseName": "عفن الجذور",
-  "severity": "High",
+  "severity": "عالية",
   "treatmentAdvice": "قم بإزالة الأجزاء المصابة وتقليل الري وتحسين تصريف التربة.",
-  "confidenceScore": 0.93
+  "confidenceScore": "%90"
 }
 ```
 
@@ -118,6 +118,14 @@ To use it:
 * Supported formats: `.jpg`, `.jpeg`, `.png`, `.gif`.
 * Requires a valid Google Gemini API key.
 * Free tier usage is limited; exceeding quota may result in errors or charges.
+
+---
+
+## 🌿 App Preview
+
+<p align="center">
+  <img width="288" height="810" alt="App Screenshot" src="https://github.com/user-attachments/assets/51887318-14cb-42ef-8e96-c9e483be47bf" />
+</p>
 
 ---
 
