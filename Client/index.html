@@ -142,6 +142,14 @@
         const result = document.getElementById("result");
         const loading = document.getElementById("loading");
 
+
+        function formatText(text) {
+            return text
+                .replace(/\n/g, "<br>")
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+        }
+
+
         imageInput.addEventListener("change", () => {
             const file = imageInput.files[0];
             if (file) {
@@ -180,8 +188,8 @@
                     <h3>📋 النتيجة:</h3>
                     <p><strong>🪴 اسم المرض:</strong> ${data.diseaseName}</p>
                     <p><strong>⚠️ درجة الخطورة:</strong> ${data.severity}</p>
-                    <p><strong>💊 نصيحة العلاج:</strong> ${data.treatmentAdvice}</p>
-                    <p><strong>🎯 نسبة الثقة:</strong> ${(data.confidenceScore * 100).toFixed(1)}%</p>
+                    <p><strong>💊 نصيحة العلاج:</strong> ${formatText(data.treatmentAdvice)}</p>
+                    <p><strong>🎯 نسبة الثقة:</strong> ${(parseFloat(data.confidenceScore)).toFixed(1)}%</p>
                     `;
             } catch (err) {
                 result.innerHTML = `<p style="color:red;">⚠️ ${err.message}</p>`;
