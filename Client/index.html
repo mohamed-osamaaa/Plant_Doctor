@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تشخيص مرض النبات 🌿</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(to bottom right, #e8f5e9, #c8e6c9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 380px;
+            text-align: center;
+            direction: rtl;
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        p.desc {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            background: #43a047;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-block;
+        }
+
+        label:hover {
+            background: #2e7d32;
+        }
+
+        .preview {
+            margin: 20px auto;
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px dashed #a5d6a7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f8e9;
+        }
+
+        .preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        button {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #1b5e20;
+        }
+
+        #loading {
+            display: none;
+            margin-top: 15px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        #result {
+            margin-top: 25px;
+            text-align: right;
+            background: #f1f8e9;
+            padding: 15px;
+            border-radius: 10px;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        #result h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>تشخيص مرض النبات 🌿</h1>
+        <p class="desc">قم برفع صورة للنبات وسنقوم بتحليلها باستخدام الذكاء الاصطناعي.</p>
+
+        <form id="uploadForm">
+            <label for="imageInput">📷 اختر صورة النبات</label>
+            <input type="file" id="imageInput" name="image" accept="image/*" required />
+
+            <div class="preview" id="preview">
+                <span>لا توجد صورة بعد</span>
+            </div>
+
+            <button type="submit">تحليل الصورة</button>
+            <div id="loading">⏳ جاري تحليل الصورة...</div>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const imageInput = document.getElementById("imageInput");
+        const preview = document.getElementById("preview");
+        const form = document.getElementById("uploadForm");
+        const result = document.getElementById("result");
+        const loading = document.getElementById("loading");
+
+        imageInput.addEventListener("change", () => {
+            const file = imageInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="plant preview" />`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = `<span>لا توجد صورة بعد</span>`;
+            }
+        });
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const file = imageInput.files[0];
+            if (!file) return alert("من فضلك اختر صورة أولاً!");
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            loading.style.display = "block";
+            result.innerHTML = "";
+
+            try {
+                const response = await fetch("http://localhost:3000/diagnose", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!response.ok) throw new Error("حدث خطأ أثناء التحليل.");
+
+                const data = await response.json();
+
+                result.innerHTML = `
+                    <h3>📋 النتيجة:</h3>
+                    <p><strong>🪴 اسم المرض:</strong> ${data.diseaseName}</p>
+                    <p><strong>⚠️ درجة الخطورة:</strong> ${data.severity}</p>
+                    <p><strong>💊 نصيحة العلاج:</strong> ${data.treatmentAdvice}</p>
+                    <p><strong>🎯 نسبة الثقة:</strong> ${(data.confidenceScore * 100).toFixed(1)}%</p>
+                    `;
+            } catch (err) {
+                result.innerHTML = `<p style="color:red;">⚠️ ${err.message}</p>`;
+            } finally {
+                loading.style.display = "none";
+            }
+        });
+    </script>
+</body>
+
+</html>
